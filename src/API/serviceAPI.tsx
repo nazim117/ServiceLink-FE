@@ -13,13 +13,8 @@ const serviceUrl = baseUrl.services;
 
 const serviceAPI = {
   getServices : () => axios
-      .get(serviceUrl,
-        {
-          headers: { 
-            Authorization: `Bearer ${TokenManager.getAccessTokenFromLocalStorage()}`,
-          }
-        })
-      .then(res => res.data.services)
+      .get(serviceUrl)
+      .then(res => res.data.serviceProviders)
       .catch(error => {
         console.error("Error getting service: ", error);
         throw error;
@@ -32,8 +27,7 @@ const serviceAPI = {
         maxBodyLength: Infinity,
         url: `${serviceUrl}/${id}`,
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${TokenManager.getAccessTokenFromLocalStorage()}`,
+          'Content-Type': 'application/json'
         },
       };
       
@@ -53,7 +47,6 @@ const serviceAPI = {
         url: serviceUrl,
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${TokenManager.getAccessTokenFromLocalStorage()}`,
         },
         data
       };
@@ -72,7 +65,6 @@ const serviceAPI = {
       url: `${serviceUrl}/${id}`,
       headers: { 
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${TokenManager.getAccessTokenFromLocalStorage()}`,
       },
       data
     };
@@ -90,9 +82,6 @@ const serviceAPI = {
       method: 'delete',
       maxBodyLength: Infinity,
       url: `${serviceUrl}/${id}`,
-      headers: {
-        Authorization: `Bearer ${TokenManager.getAccessTokenFromLocalStorage()}`,
-       },
     };
     
     axios.request(config)
