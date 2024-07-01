@@ -31,6 +31,9 @@ function Service({ service }: ServiceProps) {
         <h3>Address</h3>
         <p>{service.address.street}, {service.address.city}, {service.address.country}, {service.address.postalCode}</p>
       </div>
+      <div>
+          {!service.offers ? "No offers available" : service.offers}
+      </div>
       {/* Render offers or other details if available */}
     </div>
   );

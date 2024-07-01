@@ -3,7 +3,7 @@ import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
 
 interface ICredentials{
-    username: string;
+    email: string;
     password: string;
 }
 

@@ -23,9 +23,6 @@ interface ServiceListProps {
 }
 
 function ServiceList({ services }: ServiceListProps) {
-  if (!services || services.length === 0) {
-    return <div>No matches available</div>;
-  }
   return (
     <div className="matches-list">
       {services.map((service) => (
