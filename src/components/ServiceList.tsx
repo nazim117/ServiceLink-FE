@@ -24,7 +24,7 @@ interface ServiceListProps {
 
 function ServiceList({ services }: ServiceListProps) {
   return (
-    <div className="matches-list">
+    <div className="service-list grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {services.map((service) => (
         <Service key={service.id} service={service} />
       ))}

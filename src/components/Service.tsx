@@ -23,16 +23,24 @@ interface ServiceProps {
 
 function Service({ service }: ServiceProps) {
   return (
-    <div className="service-item">
-      <h2>{service.name}</h2>
-      <p>{service.description}</p>
-      {service.imagePath && <img src={service.imagePath} alt={service.name} />}
-      <div>
-        <h3>Address</h3>
-        <p>{service.address.street}, {service.address.city}, {service.address.country}, {service.address.postalCode}</p>
+    <div className="service-item bg-white rounded-lg shadow-md p-4">
+      <h2 className="text-2xl font-semibold mb-2">{service.name}</h2>
+      <p className="text-gray-600 mb-4">{service.description}</p>
+      {service.imagePath && (
+        <img
+          className="w-full h-48 object-cover mb-4 rounded-md"
+          src={service.imagePath}
+          alt={service.name}
+        />
+      )}
+      <div className="mb-4">
+        <h3 className="text-lg font-medium">Address</h3>
+        <p className="text-gray-600">
+          {service.address.street}, {service.address.city}, {service.address.country}, {service.address.postalCode}
+        </p>
       </div>
-      <div>
-          {!service.offers ? "No offers available" : service.offers}
+      <div className="text-gray-600">
+        {!service.offers ? "No offers available" : service.offers}
       </div>
       {/* Render offers or other details if available */}
     </div>

@@ -34,6 +34,7 @@ const TokenManager = {
         return storedClaims ? JSON.parse(storedClaims) : null;
     },
     setClaimsToLocalStorage: (claims: IUserClaims): void => {
+        console.log("token manager claims:", claims);
         localStorage.setItem('claims', JSON.stringify(claims));
     },
     getAccessTokenFromLocalStorage: (): string | null => {
@@ -51,3 +52,4 @@ const TokenManager = {
 }
 
 export default TokenManager;
+export type { IUserClaims };

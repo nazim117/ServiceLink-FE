@@ -40,6 +40,7 @@ function LoginPage() {
             const newClaims: IUserClaims | null = await loginAPI.login(credentials);
             if (newClaims) {
                 TokenManager.setClaimsToLocalStorage(newClaims);
+                console.log("Claims: ", newClaims);
                 login();
                 navigate("/");
             } else {

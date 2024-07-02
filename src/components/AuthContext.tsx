@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!TokenManager.getClaimsFromLocalStorage());
 
     const login = () => {
+        console.log("in login");
         setIsAuthenticated(true);
     }
     const logout = () => {
