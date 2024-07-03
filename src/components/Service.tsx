@@ -1,24 +1,8 @@
 import React from "react";
-
-interface AddressType {
-  city: string;
-  country: string;
-  postalCode: string;
-  street: string;
-  id: number | null; // Assuming null or number based on your data
-}
-
-interface ServiceType {
-  id: number;
-  name: string;
-  description: string;
-  imagePath: string | null; // Assuming null or string based on your data
-  offers: any; // Update with specific type if known
-  address: AddressType;
-}
+import { IServiceType } from "../interfaces/IServiceType";
 
 interface ServiceProps {
-  service: ServiceType;
+  service: IServiceType;
 }
 
 function Service({ service }: ServiceProps) {

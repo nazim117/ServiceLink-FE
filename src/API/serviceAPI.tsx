@@ -1,13 +1,6 @@
 import axios from "axios";
-import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
-
-interface IData{
-    name: string;
-    address: string;
-    imagePath: string;
-    description: string;
-}
+import {IServiceType} from "../interfaces/IServiceType";
 
 const serviceUrl = baseUrl.services;
 
@@ -39,7 +32,7 @@ const serviceAPI = {
     }
   },
 
-  post: async (data: IData) => {
+  post: async (data: IServiceType) => {
     try{
       let config = {
         method: 'post',
@@ -58,7 +51,7 @@ const serviceAPI = {
     };
   },
 
-  edit: async (id: number, data: IData) => {
+  edit: async (id: number, data: IServiceType) => {
     let config = {
       method: 'put',
       maxBodyLength: Infinity,

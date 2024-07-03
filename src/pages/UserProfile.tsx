@@ -3,12 +3,6 @@ import userAPI from "../API/userAPI";
 import TokenManager, { IUserClaims } from "../API/TokenManager";
 import { useNavigate } from "react-router-dom";
 
-interface IUserDetails {
-    name: string;
-    email: string;
-    password: string;
-}
-
 function UserProfile() {
     const claims: IUserClaims | null = TokenManager.getClaimsFromLocalStorage();
     const [name, setName] = useState<string>("");
@@ -23,7 +17,7 @@ function UserProfile() {
                     setUserDetails(data);
                 })
                 .catch((e) => {
-                    console.error("Error retrieving user data: ", e);
+                    console.error("Error retrieving data: ", e);
                     navigate('/unauthorized');
                 });
         }

@@ -1,17 +1,8 @@
 import { jwtDecode } from "jwt-decode";
+import {IUserClaims} from "../interfaces/IUserClaims";
+import {IUserData} from "../interfaces/IUserData";
 
-// Define an interface for user claims. Adjust according to the actual structure you expect.
-interface IUserClaims {
-    [key: string]: any; // Consider specifying the expected properties more explicitly.
-}
-
-// Define the data structure for managing tokens and claims.
-interface UserData {
-    accessToken: string | null;
-    claims: IUserClaims | null;
-}
-
-const userData: UserData = {
+const userData: IUserData = {
     accessToken: null,
     claims: null
 }

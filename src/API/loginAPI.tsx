@@ -2,17 +2,6 @@ import axios from "axios";
 import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
 
-interface ICredentials{
-    email: string;
-    password: string;
-}
-
-interface IUser{
-    username: string;
-    email: string;
-    password: string;
-}
-
 const tokenUrl = baseUrl.tokens;
 
 const loginAPI = {
@@ -37,7 +26,7 @@ const loginAPI = {
         throw error;
       }
     },
-    register: async(user: IUser) => {
+    register: async(user: IUserDetails) => {
       try{
         let config = {
           method: 'post',

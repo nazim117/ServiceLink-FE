@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './pages/Home';
-import Service from './pages/Service';
+import Service from './pages/SingleService';
 import Offers from './pages/Offers';
 import Appointment from './pages/Appointment';
 import Login from './pages/Login';

@@ -2,12 +2,6 @@ import axios from "axios";
 import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
 
-interface IData{
-    name: string;
-    email: string;
-    password: string;
-}
-
 const userUrl = baseUrl.users;
 
 const userAPI = {
@@ -44,7 +38,7 @@ const userAPI = {
     }
   },
 
-  post: async (data: IData) => {
+  post: async (data: IUserDetails) => {
     try{
       let config = {
         method: 'post',
@@ -64,7 +58,7 @@ const userAPI = {
     };
   },
 
-  edit: async (id: number, data: IData) => {
+  edit: async (id: number, data: IUserDetails) => {
     let config = {
       method: 'put',
       maxBodyLength: Infinity,

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TokenManager from "../API/TokenManager";
 import loginAPI from "../API/loginAPI";
 import { useAuth } from "../components/AuthContext";
+import { IUserClaims } from "../API/TokenManager";
 
 function LoginPage() {
     const [email, setEmail] = useState('');
@@ -12,14 +13,6 @@ function LoginPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    interface ICredentials {
-        email: string;
-        password: string;
-    }
-
-    interface IUserClaims {
-        [key: string]: any; // Consider specifying the expected properties more explicitly.
-    }
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
