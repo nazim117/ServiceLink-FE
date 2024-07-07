@@ -1,6 +1,8 @@
 import axios from "axios";
 import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
+import { ICredentials } from "../interfaces/ICredentials";
+import { IUserDetails } from "../interfaces/IUserDetails";
 
 const tokenUrl = baseUrl.tokens;
 

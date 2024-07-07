@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import userAPI from "../API/userAPI";
 import TokenManager, { IUserClaims } from "../API/TokenManager";
 import { useNavigate } from "react-router-dom";
+import { IUserCredentials } from "../interfaces/IUserCredentials";
 
 function UserProfile() {
     const claims: IUserClaims | null = TokenManager.getClaimsFromLocalStorage();
@@ -13,7 +14,7 @@ function UserProfile() {
     const getUserDetails = () => {
         if (claims?.roles?.some((role: string) => ['ADMIN', "SERVICE_PROVIDER", "CLIENT"].includes(role)) && claims?.userId) {
             userAPI.getUser(claims.userId)
-                .then((data: IUserDetails) => {
+                .then((data: IUserCredentials) => {
                     setUserDetails(data);
                 })
                 .catch((e) => {
@@ -23,7 +24,7 @@ function UserProfile() {
         }
     };
 
-    const setUserDetails = (data: IUserDetails) => {
+    const setUserDetails = (data: IUserCredentials) => {
         const { name, email, password } = data;
         setName(name);
         setEmail(email);
@@ -48,7 +49,7 @@ function UserProfile() {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const userCredentials: IUserDetails = {
+        const userCredentials: IUserCredentials = {
             name,
             email,
             password,
@@ -63,22 +64,52 @@ function UserProfile() {
     };
 
     return (
-        <div className="login-container">
-            <h1>User Profile</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="box name">
-                    <label htmlFor="name">Name</label>
-                    <input type="text" id="name" value={name || ''} onChange={handleNameChange} required autoComplete="given-name" />
-                </div>
-                <div className="box email">
-                    <label htmlFor="email">Email</label>
-                    <input type="email" id="email" value={email || ''} onChange={handleEmailChange} required autoComplete="email" />
-                </div>
-                <div className="box password">
-                    <input type="hidden" id="password" value={password || ''} onChange={handlePasswordChange} required autoComplete="current-password" />
-                </div>
-                <button type="submit">Update</button>
-            </form>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="name" className="block text-gray-700">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name || ''}
+                            onChange={handleNameChange}
+                            required
+                            autoComplete="given-name"
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email || ''}
+                            onChange={handleEmailChange}
+                            required
+                            autoComplete="email"
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <input
+                            type="hidden"
+                            id="password"
+                            value={password || ''}
+                            onChange={handlePasswordChange}
+                            required
+                            autoComplete="current-password"
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                        Update
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

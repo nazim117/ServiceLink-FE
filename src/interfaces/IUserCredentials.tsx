@@ -1,6 +1,5 @@
-export interface IUserDetails {
+export interface IUserCredentials {
     name: string;
     email: string;
     password: string;
-    role: string;
 }

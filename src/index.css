@@ -15,3 +15,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.App {
+  @apply min-h-screen flex flex-col bg-[#eef0e7];
+}
+
+.main-content {
+  @apply flex-grow container mx-auto py-8 px-4 bg-[#a8c6c6] rounded shadow-lg;
+}

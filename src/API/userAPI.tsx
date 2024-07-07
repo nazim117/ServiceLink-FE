@@ -1,6 +1,8 @@
 import axios from "axios";
 import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
+import { IUserDetails } from "../interfaces/IUserDetails";
+import { IUserCredentials } from "../interfaces/IUserCredentials";
 
 const userUrl = baseUrl.users;
 
@@ -58,7 +60,7 @@ const userAPI = {
     };
   },
 
-  edit: async (id: number, data: IUserDetails) => {
+  edit: async (id: number, data: IUserCredentials) => {
     let config = {
       method: 'put',
       maxBodyLength: Infinity,

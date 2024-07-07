@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import serviceAPI from "../API/serviceAPI";
 import Service from "../components/Service";
 import { IServiceType } from "../interfaces/IServiceType";
+import OfferList from "../components/OfferList";
 
 function SingleService(){
     const [service, setService] = useState<IServiceType | null>(null);
@@ -11,6 +12,7 @@ function SingleService(){
     const refreshService = () => {
         if (serviceId) {
             const id = parseInt(serviceId, 10);
+            console.log(id);
             serviceAPI.getService(id)
                 .then((data) => {
                     setService(data);
@@ -28,7 +30,13 @@ function SingleService(){
     return(
         <div>
             <h1>Service page</h1>
-            {service && <Service key={service.id} service={service} />}
+            {
+                service && 
+                <div>
+                    <Service key={service.id} service={service} />
+                    {service.offers ? <OfferList offers={service.offers}/> : "No offers"}
+                </div>
+            }
         </div>
     )
 }

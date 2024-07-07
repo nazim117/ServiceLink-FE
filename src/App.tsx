@@ -9,21 +9,31 @@ import ProtectedRoute from './components/ProtectedRoute';
 import UserProfile from './pages/UserProfile';
 import './App.css';
 import { AuthProvider } from "./components/AuthContext";
+import NavBar from "./components/NavBar";
+import SingleService from "./pages/SingleService";
+import ServiceProfile from "./pages/ServiceProfile";
+import Unauthorized from "./pages/Unauthorized";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App min-h-screen flex flex-col bg-[#eef0e7]">
       <AuthProvider>
         <Router>
-          <Routes>
-            <Route path='/' element={<Home/>}/>
-            <Route path='/service' element={<Service/>}/>
-            <Route path='/service/:serviceId/offers' element={<Offers/>}/>
-            <Route path='/service/:serviceId/offers/:offersId/appointment' element={<Appointment/>}/>
-            <Route path="/login" element={<Login/>} />
-            <Route path="/register" element={<Register/>}/>
-            <Route path="/userProfile" element={<ProtectedRoute element={<UserProfile/>} />} />
-          </Routes>
+          <NavBar />
+          <div className="main-content flex-grow container mx-auto py-8 px-4 bg-[#a8c6c6] rounded shadow-lg">
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/service' element={<Service />} />
+              <Route path='/service/:serviceId' element={<SingleService />} />
+              <Route path='/service/:serviceId/offers' element={<Offers />} />
+              <Route path='/service/:serviceId/offers/:offersId/appointment' element={<Appointment />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/userProfile" element={<ProtectedRoute element={<UserProfile />} />} />
+              <Route path="/service-profile" element={<ProtectedRoute element={<ServiceProfile />} />} />
+              <Route path="/unauthorized" element={<Unauthorized/>}/>
+            </Routes>
+          </div>
         </Router>
       </AuthProvider>
     </div>
