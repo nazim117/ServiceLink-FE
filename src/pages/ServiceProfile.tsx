@@ -3,6 +3,7 @@ import offerAPI from "../API/offerAPI";
 import { IOfferType } from "../interfaces/IOfferType";
 import { Dialog, Transition } from '@headlessui/react';
 import { useParams } from "react-router-dom";
+import OfferList from "../components/OfferList";
 
 // Assuming serviceProviderId is obtained from the application's state or context
 
@@ -11,6 +12,7 @@ function ServiceProfile() {
     const {serviceId: serviceIdString} = useParams();
     const serviceId = Number(serviceIdString);
     const [newOffer, setNewOffer] = useState<IOfferType>({
+        id: 0,
         name: "",
         description: "",
         duration: "",
@@ -50,6 +52,7 @@ function ServiceProfile() {
             .then(response => {
                 setOffers([...offers, response]);
                 setNewOffer({
+                    id: 0,
                     name: "",
                     description: "",
                     duration: "",
@@ -68,15 +71,7 @@ function ServiceProfile() {
             <div className="mt-8 w-full max-w-md">
                 <h2 className="text-xl font-semibold mb-4 text-center">Your Offers</h2>
                 {offers.length > 0 ? (
-                    offers.map((offer, index) => (
-                        <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4 border border-gray-300">
-                            <h3 className="text-lg font-medium">{offer.name}</h3>
-                            <p className="text-sm text-gray-600">{offer.description}</p>
-                            <p className="text-sm">Duration: {offer.duration} minutes</p>
-                            <p className="text-sm">Price: ${offer.price}</p>
-                            <img src={offer.imagePath} alt={offer.name} className="w-full h-32 object-cover mt-2 rounded-md"/>
-                        </div>
-                    ))
+                    <OfferList offers={offers}/>
                 ) : (
                     <p className="text-center text-gray-500">No offers available</p>
                 )}

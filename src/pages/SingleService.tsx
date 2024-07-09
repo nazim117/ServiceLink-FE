@@ -33,8 +33,6 @@ function SingleService(){
         refreshService();
     }, [serviceId]);
 
-console.log(service);
-
     return(
         <div>
             <h1>Service page</h1>
