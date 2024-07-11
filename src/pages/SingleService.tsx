@@ -40,7 +40,7 @@ function SingleService(){
                 service && 
                 <div>
                     <Service key={service.id} service={service} />
-                    {offers ? <OfferList offers={offers}/> : "No offers"}
+                    {offers ? <OfferList offers={offers} serviceId={service.id}/> : "No offers"}
                 </div>
             }
         </div>

@@ -71,7 +71,7 @@ function ServiceProfile() {
             <div className="mt-8 w-full max-w-md">
                 <h2 className="text-xl font-semibold mb-4 text-center">Your Offers</h2>
                 {offers.length > 0 ? (
-                    <OfferList offers={offers}/>
+                    <OfferList offers={offers} serviceId={serviceId}/>
                 ) : (
                     <p className="text-center text-gray-500">No offers available</p>
                 )}
