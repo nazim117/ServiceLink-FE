@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import loginAPI from "../API/loginAPI";
 import TokenManager from "../API/TokenManager";
 import { useAuth } from "../components/AuthContext";
-import { IUserClaims } from "../API/TokenManager";
 import { IUserDetails } from "../interfaces/IUserDetails";
 
 function Register() {

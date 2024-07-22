@@ -1,7 +1,6 @@
 import axios from 'axios';
 import baseUrl from './baseUrl';
 import { IAppointmentType } from '../interfaces/IAppointmentType';
-import TokenManager from './TokenManager';
 
 const appointmentUrl = baseUrl.appointments;
 

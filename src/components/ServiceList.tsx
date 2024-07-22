@@ -1,6 +1,7 @@
 import React from "react";
 import Service from "../components/Service";
 
+
 interface AddressType {
   city: string;
   country: string;
@@ -22,7 +23,7 @@ interface ServiceListProps {
   services: ServiceType[];
 }
 
-function ServiceList({ services }: ServiceListProps) {
+function ServiceList({ services = [] }: ServiceListProps) {
   return (
     <div className="service-list grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {services.map((service) => (
@@ -31,5 +32,6 @@ function ServiceList({ services }: ServiceListProps) {
     </div>
   );
 }
+
 
 export default ServiceList;

@@ -1,7 +1,6 @@
 import axios from "axios";
 import baseUrl from "./baseUrl";
 import { IOfferType } from "../interfaces/IOfferType";
-import TokenManager from "./TokenManager";
 
 const offerUrl = baseUrl.offers;
 

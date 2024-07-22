@@ -4,13 +4,20 @@ import ServiceList from "../components/ServiceList";
 
 function Home() {
   const [services, setServices] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const refreshServices = () => {
+    setIsLoading(true);
     serviceAPI.getServices().then((data) => {
-      console.log(data);
       setServices(data);
+      setIsLoading(false);
+    }).catch(error => {
+      console.error("Failed to fetch services:", error);
+      setServices([]);
+      setIsLoading(false);
     });
   };
+
 
   useEffect(() => {
     refreshServices();
@@ -18,8 +25,12 @@ function Home() {
 
   return (
     <div className="home min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold text-center mb-6">Home Page</h1>
+        {isLoading ? (
+        <p>Loading services...</p>
+      ) : (
       <ServiceList services={services} />
+    )}
+
     </div>
   );
 }

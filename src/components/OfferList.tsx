@@ -1,4 +1,3 @@
-import { off } from "process";
 import { IOfferType } from "../interfaces/IOfferType";
 import { Offer } from "./Offer";
 
@@ -12,7 +11,7 @@ function OfferList({offers, serviceId}: OfferListProps){
     return(
         <>
             {
-                offers.map((offer: IOfferType, index: number) => (
+                offers && offers.map((offer: IOfferType, index: number) => (
                     <Offer key={index} offer={offer} serviceId={serviceId} index={index}/>
                 ))
             }
