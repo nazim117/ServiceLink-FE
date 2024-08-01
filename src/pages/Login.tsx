@@ -5,6 +5,7 @@ import loginAPI from "../API/loginAPI";
 import { useAuth } from "../components/AuthContext";
 import { IUserClaims } from "../API/TokenManager";
 import { ICredentials } from "../interfaces/ICredentials";
+import { Link } from "react-router-dom";
 
 function LoginPage() {
     const [email, setEmail] = useState('');
@@ -103,7 +104,7 @@ function LoginPage() {
                     {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
                 </form>
                 <div className="mt-4 text-center">
-                    <a className="text-blue-500 hover:text-blue-700" href="/register">Create account</a>
+                    <Link className="text-blue-500 hover:text-blue-700" to="/register">Create account</Link>
                 </div>
             </div>
         </div>

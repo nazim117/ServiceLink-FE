@@ -1,26 +1,8 @@
-import React from "react";
 import Service from "../components/Service";
-
-
-interface AddressType {
-  city: string;
-  country: string;
-  postalCode: string;
-  street: string;
-  id: number | null;
-}
-
-interface ServiceType {
-  id: number;
-  name: string;
-  description: string;
-  imagePath: string | null;
-  offers: any; // Update with specific type if known
-  address: AddressType;
-}
+import { IServiceType } from "../interfaces/IServiceType";
 
 interface ServiceListProps {
-  services: ServiceType[];
+  services: IServiceType[];
 }
 
 function ServiceList({ services = [] }: ServiceListProps) {

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 function Unauthorized() {
     return(
@@ -9,7 +10,7 @@ function Unauthorized() {
                 <ul>
                     <li>Check if you are logged in.</li>
                     <li>Ensure you have the correct permissions to acces this resource.</li>
-                    <li>Return to the <a href="/">Home page</a>.</li>
+                    <li>Return to the <Link to="/">Home page</Link>.</li>
                     <li>Contact support if you believe this is a mistake.</li>
                 </ul>
             </div>
