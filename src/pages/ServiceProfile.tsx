@@ -4,6 +4,8 @@ import { IOfferType } from "../interfaces/IOfferType";
 import { Dialog, Transition } from '@headlessui/react';
 import { useParams } from "react-router-dom";
 import OfferList from "../components/OfferList";
+import { IServiceType } from "../interfaces/IServiceType";
+import serviceAPI from "../API/serviceAPI";
 
 // Assuming serviceProviderId is obtained from the application's state or context
 
@@ -20,8 +22,26 @@ function ServiceProfile() {
         price: 0,
     });
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [newService, setNewService] = useState<IServiceType>({
+        id: 0,
+        name: "",
+        description: "",
+        imagePath: "",
+        offers: [],
+        address: {
+            id: 0,
+            street: "",
+            city: "",
+            postalCode: "",
+            country: ""
+        }
+    });
 
     useEffect(() => {
+        if (!serviceId) {
+            return;
+        }
+
         offerAPI.get(serviceId)
             .then(response => {
                 setOffers(response);
@@ -29,25 +49,37 @@ function ServiceProfile() {
             .catch(error => {
                 console.error("Error fetching offers:", error);
             });
-    }, []);
+    }, [serviceId]);
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setNewOffer({ ...newOffer, [name]: name === "duration" || name === "price" ? Number(value) : value });
     };
 
+    const handleServiceChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        console.log("name: ", name)
+        if (name.startsWith("address.")) {    
+        const addressField = name.split(".")[1];
+        setNewService(prevService => ({
+            ...prevService,
+            address: {
+                ...prevService.address,
+                [addressField]: value
+            }
+        }));
+    } else {
+        setNewService({ ...newService, [name]: value });
+    }
+    };
+
     const handleAddOffer = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Ensure serviceProviderId is added to the offer
         const offerToCreate = {
             ...newOffer,
             serviceId,
         };
 
-        // Log the new offer data before making the API call
-        console.log("Adding new offer:", offerToCreate);
-
-        // Add the new offer to the backend
         offerAPI.create(offerToCreate)
             .then(response => {
                 setOffers([...offers, response]);
@@ -65,6 +97,59 @@ function ServiceProfile() {
                 console.error("Error adding offer:", error);
             });
     };
+
+    const handleAddService = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        serviceAPI.post(newService)
+            .then(response => {
+                setNewService(response);
+                window.location.href = `/services/${response.id}`; // Redirect to the new service profile page
+            })
+            .catch(error => {
+                console.error("Error adding service:", error);
+            });
+    };
+
+    if (!serviceId) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
+                <div className="mt-8 w-full max-w-md">
+                    <h2 className="text-xl font-semibold mb-4 text-center">Create a New Service</h2>
+                    <form onSubmit={handleAddService} className="mt-4 space-y-4">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Service Name</label>
+                            <input type="text" id="name" name="name" value={newService.name} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <div>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea id="description" name="description" value={newService.description} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+                        <div>
+                            <label htmlFor="imagePath" className="block text-sm font-medium text-gray-700">Image Path</label>
+                            <input type="text" id="imagePath" name="imagePath" value={newService.imagePath} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <div>
+                            <label htmlFor="street" className="block text-sm font-medium text-gray-700">Street</label>
+                            <input type="text" id="street" name="address.street" value={newService.address.street} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <div>
+                            <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" id="city" name="address.city" value={newService.address.city} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <div>
+                            <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Postal Code</label>
+                            <input type="text" id="postalCode" name="address.postalCode" value={newService.address.postalCode} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <div>
+                            <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
+                            <input type="text" id="country" name="address.country" value={newService.address.country} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                        </div>
+                        <button type="submit" className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out">Create Service</button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
