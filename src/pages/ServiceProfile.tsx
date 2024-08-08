@@ -2,17 +2,17 @@ import { ChangeEvent, FormEvent, useState, useEffect, Fragment } from "react";
 import offerAPI from "../API/offerAPI";
 import { IOfferType } from "../interfaces/IOfferType";
 import { Dialog, Transition } from '@headlessui/react';
-import { useParams } from "react-router-dom";
 import OfferList from "../components/OfferList";
 import { IServiceType } from "../interfaces/IServiceType";
 import serviceAPI from "../API/serviceAPI";
-
-// Assuming serviceProviderId is obtained from the application's state or context
+import TokenManager from "../API/TokenManager";
+import { useNavigate } from 'react-router-dom';
 
 function ServiceProfile() {
+    const navigate = useNavigate();
+    const userId = TokenManager.getClaimsFromLocalStorage()?.userId;
+    const [serviceId, setServiceId] = useState(Number);
     const [offers, setOffers] = useState<IOfferType[]>([]);
-    const {serviceId: serviceIdString} = useParams();
-    const serviceId = Number(serviceIdString);
     const [newOffer, setNewOffer] = useState<IOfferType>({
         id: 0,
         name: "",
@@ -34,14 +34,20 @@ function ServiceProfile() {
             city: "",
             postalCode: "",
             country: ""
-        }
+        },
+        userId: userId,
     });
 
     useEffect(() => {
-        if (!serviceId) {
-            return;
-        }
+        serviceAPI.getServiceByUserId(userId)
+        .then(res => {
+            setServiceId(res.id);
+        })
+        .catch(error => {
+            console.error("Error getting service: ", error);
+        })
 
+        console.log("ser id ", serviceId);
         offerAPI.get(serviceId)
             .then(response => {
                 setOffers(response);
@@ -49,7 +55,7 @@ function ServiceProfile() {
             .catch(error => {
                 console.error("Error fetching offers:", error);
             });
-    }, [serviceId]);
+    }, []);
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -58,7 +64,6 @@ function ServiceProfile() {
 
     const handleServiceChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        console.log("name: ", name)
         if (name.startsWith("address.")) {    
         const addressField = name.split(".")[1];
         setNewService(prevService => ({
@@ -103,7 +108,8 @@ function ServiceProfile() {
         serviceAPI.post(newService)
             .then(response => {
                 setNewService(response);
-                window.location.href = `/services/${response.id}`; // Redirect to the new service profile page
+                console.log("REsponse: ", response)
+                navigate("/service-profile"); // Redirect to the new service profile page
             })
             .catch(error => {
                 console.error("Error adding service:", error);

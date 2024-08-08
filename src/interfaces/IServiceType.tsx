@@ -8,4 +8,5 @@ export interface IServiceType {
     imagePath: string; // Assuming null or string based on your data
     offers: IOfferType[]; // Update with specific type if known
     address: AddressType;
+    userId: any;
 }

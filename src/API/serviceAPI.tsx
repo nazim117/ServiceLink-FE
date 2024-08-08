@@ -32,6 +32,24 @@ const serviceAPI = {
     }
   },
 
+  getServiceByUserId : async (id: number) =>{
+    try{
+      let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${serviceUrl}/user/${id}`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+      };
+      
+      const response = await axios.request(config);
+      return response.data;
+    }catch(error) {
+      throw error;
+    }
+  },
+
   post: async (data: IServiceType) => {
     try{
       let config = {
