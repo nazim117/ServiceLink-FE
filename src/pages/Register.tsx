@@ -56,7 +56,7 @@ function Register() {
             name,
             email,
             password,
-            role, // include the role in the user details
+            role,
         };
 
         loginAPI.register(newUser)

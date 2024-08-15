@@ -3,7 +3,6 @@ import TokenManager from "./TokenManager";
 import baseUrl from "./baseUrl";
 import { ICredentials } from "../interfaces/ICredentials";
 import { IUserDetails } from "../interfaces/IUserDetails";
-
 const tokenUrl = baseUrl.tokens;
 
 const loginAPI = {
@@ -24,7 +23,6 @@ const loginAPI = {
         TokenManager.setAccessTokenToLocalStorage(accessToken);
         return TokenManager.setAccessToken(accessToken)
       }catch(error) {
-        console.error(error);
         throw error;
       }
     },
@@ -45,7 +43,6 @@ const loginAPI = {
         TokenManager.setAccessTokenToLocalStorage(accessToken);
         return TokenManager.setAccessToken(accessToken)
       }catch(error) {
-        console.error(error);
         throw error;
       }
     }

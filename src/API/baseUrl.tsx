@@ -1,5 +1,4 @@
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:8080/api";
-console.log('Environment Variable:', process.env.REACT_APP_BASE_URL);
 console.log("base url: ", BASE_URL );
 
 const baseUrl = {
