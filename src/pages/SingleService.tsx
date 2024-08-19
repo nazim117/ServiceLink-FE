@@ -19,6 +19,7 @@ function SingleService(){
             serviceAPI.getService(id)
                 .then((data) => {
                     setService(data);
+                    
                     offerAPI.get(id)
                     .then((data) => setOffers(data))
                     .catch((error) => console.error("Error fetching offers: ", error))

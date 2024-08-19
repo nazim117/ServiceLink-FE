@@ -20,6 +20,7 @@ function ServiceProfile() {
         duration: "",
         imagePath: "",
         price: 0,
+        serviceId: 0,
     });
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [newService, setNewService] = useState<IServiceType>({
@@ -39,23 +40,24 @@ function ServiceProfile() {
     });
 
     useEffect(() => {
-        serviceAPI.getServiceByUserId(userId)
-        .then(res => {
-            setServiceId(res.id);
-        })
-        .catch(error => {
-            console.error("Error getting service: ", error);
-        })
-
-        console.log("ser id ", serviceId);
-        offerAPI.get(serviceId)
-            .then(response => {
+        const fetchServiceAndOffers = async () => {
+            try {
+                // First, fetch the service by userId
+                const res = await serviceAPI.getServiceByUserId(userId);
+                const serviceId = res.id;
+                setServiceId(serviceId);
+    
+                // Then, use the retrieved serviceId to fetch the offers
+                const response = await offerAPI.get(serviceId);
                 setOffers(response);
-            })
-            .catch(error => {
-                console.error("Error fetching offers:", error);
-            });
-    }, []);
+            } catch (error) {
+                console.error("Error occurred:", error);
+            }
+        };
+    
+        fetchServiceAndOffers();
+    }, []); // Add userId as a dependency to re-run this effect if userId changes
+    
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -95,6 +97,7 @@ function ServiceProfile() {
                     duration: "",
                     imagePath: "",
                     price: 0,
+                    serviceId: 0,
                 });
                 setIsModalOpen(false);
             })

@@ -5,4 +5,5 @@ export interface IOfferType{
     description: string;
     imagePath: string;
     price: number;
+    serviceId: number;
 }

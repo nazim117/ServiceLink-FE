@@ -5,13 +5,12 @@ import { IAppointmentType } from '../interfaces/IAppointmentType';
 const appointmentUrl = baseUrl.appointments;
 
 const appointmentAPI = {
-  async getAllAppointments() {
+  async getAllAppointments(serviceId: number) {
     try {
-      const response = await axios.get(appointmentUrl);
+      const response = await axios.get(`${appointmentUrl}/serviceId/${serviceId}`);
       console.log("appointments: ", response.data.appointments);
       return response.data.appointments;
     } catch (error) {
-      console.error('Failed to fetch appointments', error);
       throw error;
     }
   },

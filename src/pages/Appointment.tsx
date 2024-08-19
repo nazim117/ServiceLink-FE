@@ -1,42 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { Calendar, momentLocalizer, View, SlotInfo } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import appointmentAPI from '../API/appointmentAPI';
 import { IAppointmentType } from '../interfaces/IAppointmentType';
+import { IOfferType } from '../interfaces/IOfferType';
+import { ITimeSlot } from '../interfaces/ITimeSlot'
 
 const localizer = momentLocalizer(moment);
 
-interface TimeSlot {
-  start: Date;
-  end: Date;
-  occupied: boolean;
-}
-
-interface IOfferType {
-  id: number;
-  name: string;
-  description: string;
-  duration: number;
-  price: number;
-  imagePath: string;
-}
-
 function Appointment() {
+  
+  const { serviceId, offerId } = useParams(); // Retrieve serviceId and offerId from the URL
+  const serviceIdnum = Number(serviceId);
+  const offerIdnum = Number(offerId);
   const location = useLocation();
   const offer = location.state?.offer as IOfferType;
-
   const [view, setView] = useState<View>('month');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [timeSlots, setTimeSlots] = useState<ITimeSlot[]>([]);
   const [showBookingForm, setShowBookingForm] = useState<boolean>(false);
   const [bookingDetails, setBookingDetails] = useState<{ clientName: string; clientEmail: string; startTime: string }>({
     clientName: '',
     clientEmail: '',
     startTime: ''
   });
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<ITimeSlot | null>(null);
 
   useEffect(() => {
     if (selectedDate) {
@@ -46,7 +36,7 @@ function Appointment() {
 
   const fetchTimeSlots = async (date: Date) => {
     try {
-      const response = await appointmentAPI.getAllAppointments();
+      const response = await appointmentAPI.getAllAppointments(serviceIdnum);
       console.log("response: ", response);
       console.log("date:", date);
   
@@ -74,7 +64,6 @@ function Appointment() {
     }
   };
   
-
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     const selectedDate = moment(slotInfo.start).startOf('day').toDate();
     setSelectedDate(selectedDate);
@@ -110,7 +99,7 @@ function Appointment() {
         const newAppointment: IAppointmentType = {
           startDate: startDateTime,
           endDate: endDateTime,
-          serviceId: offer.id, // Assuming serviceId is offer.id, adjust if necessary
+          serviceId: serviceIdnum, // Assuming serviceId is offer.id, adjust if necessary
           offerId: offer.id,
           clientName: bookingDetails.clientName,
           clientEmail: bookingDetails.clientEmail,
@@ -125,7 +114,7 @@ function Appointment() {
     }
   };
 
-  const eventPropGetter = (event: TimeSlot) => {
+  const eventPropGetter = (event: ITimeSlot) => {
     const backgroundColor = event.occupied ? '#ff6961' : '#77dd77'; // Red for occupied, green for free
     return { style: { backgroundColor } };
   };
