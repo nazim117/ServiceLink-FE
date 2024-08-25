@@ -13,6 +13,7 @@ import NavBar from "./components/NavBar";
 import SingleService from "./pages/SingleService";
 import ServiceProfile from "./pages/ServiceProfile";
 import Unauthorized from "./pages/Unauthorized";
+import usePageTracking from "./usePageTracking"; 
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <AuthProvider>
         <Router>
           <NavBar />
+          <PageTracker />
           <div className="main-content flex-grow container mx-auto py-8 px-4 bg-[#a8c6c6] rounded shadow-lg">
             <Routes>
               <Route path='/' element={<Home />} />
@@ -38,6 +40,11 @@ function App() {
       </AuthProvider>
     </div>
   );
+}
+
+function PageTracker() {
+  usePageTracking();
+  return null;
 }
 
 export default App;

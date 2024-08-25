@@ -17,8 +17,7 @@ function ServiceProfile() {
         id: 0,
         name: "",
         description: "",
-        duration: "",
-        imagePath: "",
+        duration: 0,
         price: 0,
         serviceId: 0,
     });
@@ -27,7 +26,6 @@ function ServiceProfile() {
         id: 0,
         name: "",
         description: "",
-        imagePath: "",
         offers: [],
         address: {
             id: 0,
@@ -57,45 +55,69 @@ function ServiceProfile() {
     
         fetchServiceAndOffers();
     }, []); // Add userId as a dependency to re-run this effect if userId changes
-    
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setNewOffer({ ...newOffer, [name]: name === "duration" || name === "price" ? Number(value) : value });
+        const { name, value, files } = e.target as HTMLInputElement;
+        if (name === "imageFile" && files && files.length > 0) {
+            // Handle the file input
+            setNewOffer(prevOffer => ({
+                ...prevOffer,
+                imageFile: files[0] // Store the selected file
+            }));
+        } else {
+            // Handle other input types
+            setNewOffer(prevOffer => ({
+                ...prevOffer,
+                [name]: name === "duration" || name === "price" ? Number(value) : value
+            }));
+        }
     };
-
+    
     const handleServiceChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+    
         if (name.startsWith("address.")) {    
-        const addressField = name.split(".")[1];
-        setNewService(prevService => ({
-            ...prevService,
-            address: {
-                ...prevService.address,
-                [addressField]: value
-            }
-        }));
-    } else {
-        setNewService({ ...newService, [name]: value });
-    }
+            const addressField = name.split(".")[1];
+            setNewService(prevService => ({
+                ...prevService,
+                address: {
+                    ...prevService.address,
+                    [addressField]: value
+                }
+            }));
+        } else if (name === "imageFile" && e.target instanceof HTMLInputElement && e.target.files) {
+            const imageFile = e.target.files[0];
+            setNewService(prevService => ({
+                ...prevService,
+                imageFile: imageFile  // This requires adjustments in the `IServiceType` interface.
+            }));
+        } else {
+            setNewService({ ...newService, [name]: value });
+        }
     };
 
     const handleAddOffer = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const offerToCreate = {
-            ...newOffer,
-            serviceId,
-        };
+        
+        const formData = new FormData();
+        formData.append('name', newOffer.name);
+        formData.append('description', newOffer.description);
+        formData.append('duration', `PT${newOffer.duration}M`); // Assuming ISO-8601 duration format
+        formData.append('price', newOffer.price.toString());
+        formData.append('serviceId', serviceId.toString());
+    
+        if (newOffer.imageFile) {
+            formData.append('imageFile', newOffer.imageFile);
+        }
 
-        offerAPI.create(offerToCreate)
+        offerAPI.create(formData)
             .then(response => {
                 setOffers([...offers, response]);
                 setNewOffer({
                     id: 0,
                     name: "",
                     description: "",
-                    duration: "",
-                    imagePath: "",
+                    duration: 0,
                     price: 0,
                     serviceId: 0,
                 });
@@ -106,19 +128,43 @@ function ServiceProfile() {
             });
     };
 
+    const convertServiceToFormData = (service: IServiceType): FormData => {
+        const formData = new FormData();
+    
+        formData.append('name', service.name);
+        formData.append('description', service.description);
+        formData.append('userId', service.userId.toString());
+    
+        if (service.imageFile) {
+            formData.append('imageFile', service.imageFile);
+        }
+    
+        formData.append('street', service.address.street);
+        formData.append('city', service.address.city);
+        formData.append('postalCode', service.address.postalCode);
+        formData.append('country', service.address.country);
+    
+        formData.forEach((value, key) => {
+            console.log(`${key}:`, value);
+        });
+
+        return formData;
+    };
+    
     const handleAddService = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        serviceAPI.post(newService)
+        const formData = convertServiceToFormData(newService);
+    
+        serviceAPI.post(formData)
             .then(response => {
                 setNewService(response);
-                console.log("REsponse: ", response)
-                navigate("/service-profile"); // Redirect to the new service profile page
+                navigate("/service-profile");
             })
             .catch(error => {
                 console.error("Error adding service:", error);
             });
     };
-
+    
     if (!serviceId) {
         return (
             <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
@@ -134,8 +180,8 @@ function ServiceProfile() {
                             <textarea id="description" name="description" value={newService.description} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                         </div>
                         <div>
-                            <label htmlFor="imagePath" className="block text-sm font-medium text-gray-700">Image Path</label>
-                            <input type="text" id="imagePath" name="imagePath" value={newService.imagePath} onChange={handleServiceChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                            <label htmlFor="imageFile" className="block text-sm font-medium text-gray-700">Upload Image</label>
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*" onChange={handleServiceChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                         </div>
                         <div>
                             <label htmlFor="street" className="block text-sm font-medium text-gray-700">Street</label>
@@ -224,8 +270,8 @@ function ServiceProfile() {
                                         <input type="number" id="duration" name="duration" value={newOffer.duration} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                                     </div>
                                     <div>
-                                        <label htmlFor="imagePath" className="block text-sm font-medium text-gray-700">Image Path</label>
-                                        <input type="text" id="imagePath" name="imagePath" value={newOffer.imagePath} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                                        <label htmlFor="imageFile" className="block text-sm font-medium text-gray-700">Image Path</label>
+                                        <input type="file" accept="image/*" id="imageFile" name="imageFile" onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                                     </div>
                                     <div>
                                         <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>

@@ -1,6 +1,5 @@
 import axios from "axios";
 import baseUrl from "./baseUrl";
-import { IOfferType } from "../interfaces/IOfferType";
 
 const offerUrl = baseUrl.offers;
 
@@ -13,13 +12,13 @@ const offerAPI = {
         throw error;
       }),
     
-    create: async (data: IOfferType) => {
+    create: async (data: FormData) => {
         try{
           let config = {
             method: 'post',
             maxBodyLength: Infinity,
             url: offerUrl,
-            data
+            data,
           };
           const response = await axios.request(config);
           return response.data;

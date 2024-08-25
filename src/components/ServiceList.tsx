@@ -1,5 +1,6 @@
 import Service from "../components/Service";
 import { IServiceType } from "../interfaces/IServiceType";
+import "../styles/service.css";
 
 interface ServiceListProps {
   services: IServiceType[];
@@ -7,13 +8,12 @@ interface ServiceListProps {
 
 function ServiceList({ services = [] }: ServiceListProps) {
   return (
-    <div className="service-list grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="service-list">
       {services.map((service) => (
         <Service key={service.id} service={service} />
       ))}
     </div>
   );
 }
-
 
 export default ServiceList;

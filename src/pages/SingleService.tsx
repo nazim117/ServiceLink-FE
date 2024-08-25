@@ -15,7 +15,6 @@ function SingleService(){
     const refreshService = () => {
         if (serviceId) {
             const id = parseInt(serviceId, 10);
-            console.log(id);
             serviceAPI.getService(id)
                 .then((data) => {
                     setService(data);
@@ -36,7 +35,6 @@ function SingleService(){
 
     return(
         <div>
-            <h1>Service page</h1>
             {
                 service && 
                 <div>

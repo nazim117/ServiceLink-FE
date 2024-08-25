@@ -1,9 +1,9 @@
 export interface IOfferType{
     id: number;
     name: string;
-    duration: string;
+    duration: number;
     description: string;
-    imagePath: string;
+    imageFile?: File;
     price: number;
     serviceId: number;
 }

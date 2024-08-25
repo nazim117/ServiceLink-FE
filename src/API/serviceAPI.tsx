@@ -50,15 +50,12 @@ const serviceAPI = {
     }
   },
 
-  post: async (data: IServiceType) => {
+  post: async (data: FormData) => {
     try{
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
         url: serviceUrl,
-        headers: { 
-          'Content-Type': 'application/json',
-        },
         data
       };
       const response = await axios.request(config);
