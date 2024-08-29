@@ -1,0 +1,12 @@
+.modal {
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+}
+
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
