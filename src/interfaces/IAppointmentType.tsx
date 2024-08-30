@@ -1,4 +1,5 @@
 export interface IAppointmentType{
+    id?: number;
     startDate: Date;
     endDate: Date;
     serviceId: number;

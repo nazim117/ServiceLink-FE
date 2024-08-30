@@ -26,6 +26,9 @@ function NavBar() {
                                 <li className="nav-item">
                                     <Link className="text-gray-700 hover:text-blue-500" to="/service-profile">SERVICE</Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link className="text-gray-700 hover:text-blue-500" to="/appointmentmanager">BOOKING</Link>
+                                </li>
                             </>
                         )}
                     </ul>

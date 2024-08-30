@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './pages/Home';
 import Service from './pages/SingleService';
-import Offers from './pages/Offers';
 import Appointment from './pages/Appointment';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,6 +13,7 @@ import SingleService from "./pages/SingleService";
 import ServiceProfile from "./pages/ServiceProfile";
 import Unauthorized from "./pages/Unauthorized";
 import usePageTracking from "./usePageTracking"; 
+import AppointmentsPage from "./pages/AppointmentManager";
 
 function App() {
   return (
@@ -27,8 +27,8 @@ function App() {
               <Route path='/' element={<Home />} />
               <Route path='/service' element={<Service />} />
               <Route path='/service/:serviceId' element={<SingleService />} />
-              <Route path='/service/:serviceId/offers' element={<Offers />} />
               <Route path='/service/:serviceId/offers/:offerId/appointment' element={<Appointment />} />
+              <Route path="/appointmentmanager" element={<AppointmentsPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/userProfile" element={<ProtectedRoute element={<UserProfile />} />} />

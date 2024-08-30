@@ -8,7 +8,6 @@ const appointmentAPI = {
   async getAllAppointments(serviceId: number) {
     try {
       const response = await axios.get(`${appointmentUrl}/serviceId/${serviceId}`);
-      console.log("appointments: ", response.data.appointments);
       return response.data.appointments;
     } catch (error) {
       throw error;
