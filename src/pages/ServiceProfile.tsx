@@ -6,9 +6,10 @@ import OfferList from "../components/OfferList";
 import { IServiceType } from "../interfaces/IServiceType";
 import serviceAPI from "../API/serviceAPI";
 import TokenManager from "../API/TokenManager";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function ServiceProfile() {
+    const location = useLocation();
     const navigate = useNavigate();
     const userId = TokenManager.getClaimsFromLocalStorage()?.userId;
     const [serviceId, setServiceId] = useState(Number);
@@ -48,13 +49,23 @@ function ServiceProfile() {
                 // Then, use the retrieved serviceId to fetch the offers
                 const response = await offerAPI.get(serviceId);
                 setOffers(response);
-            } catch (error) {
-                console.error("Error occurred:", error);
-            }
+            } catch (error: unknown) {
+                // Type guard to ensure error is an instance of Error
+                if (error instanceof Error) {
+                  if (error.message === 'Service not found') {
+                    console.error("Service not found:", error);
+                    setOffers([]); // Optionally clear offers
+                  } else {
+                    console.error("An unexpected error occurred:", error);
+                  }
+                } else {
+                  console.error("An unexpected error occurred:", error);
+                }
+              }
         };
     
         fetchServiceAndOffers();
-    }, []); // Add userId as a dependency to re-run this effect if userId changes
+    }, [userId]);
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, files } = e.target as HTMLInputElement;
@@ -98,7 +109,7 @@ function ServiceProfile() {
 
     const handleAddOffer = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
+    
         const formData = new FormData();
         formData.append('name', newOffer.name);
         formData.append('description', newOffer.description);
@@ -109,7 +120,7 @@ function ServiceProfile() {
         if (newOffer.imageFile) {
             formData.append('imageFile', newOffer.imageFile);
         }
-
+    
         offerAPI.create(formData)
             .then(response => {
                 setOffers([...offers, response]);
@@ -151,18 +162,20 @@ function ServiceProfile() {
         return formData;
     };
     
-    const handleAddService = (e: FormEvent<HTMLFormElement>) => {
+    const handleAddService = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = convertServiceToFormData(newService);
     
-        serviceAPI.post(formData)
-            .then(response => {
-                setNewService(response);
-                navigate("/service-profile");
+        try {
+            serviceAPI.post(formData)
+            .then(() => {
+                console.log("redirecting...")
+                alert("Service created! refresh to start adding offers");
+                navigate(`/service-profile`, { state: { refetch: true } });
             })
-            .catch(error => {
-                console.error("Error adding service:", error);
-            });
+        } catch (error) {
+            console.error("Error adding service:", error);
+        }
     };
     
     if (!serviceId) {
@@ -224,7 +237,6 @@ function ServiceProfile() {
                     </button>
                 </div>
             </div>
-
             <Transition appear show={isModalOpen} as={Fragment}>
                 <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={() => setIsModalOpen(false)}>
                     <div className="min-h-screen px-4 text-center">
