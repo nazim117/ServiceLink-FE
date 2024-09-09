@@ -11,9 +11,7 @@ function OfferList({ offers, serviceId }: OfferListProps) {
   return (
     <div className="offer-list">
       {offers && offers.map((offer: IOfferType, index: number) => (
-        <div key={index} className="offer-item">
           <Offer offer={offer} serviceId={serviceId} index={index} />
-        </div>
       ))}
     </div>
   );

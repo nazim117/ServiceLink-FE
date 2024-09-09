@@ -6,10 +6,9 @@ import OfferList from "../components/OfferList";
 import { IServiceType } from "../interfaces/IServiceType";
 import serviceAPI from "../API/serviceAPI";
 import TokenManager from "../API/TokenManager";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function ServiceProfile() {
-    const location = useLocation();
     const navigate = useNavigate();
     const userId = TokenManager.getClaimsFromLocalStorage()?.userId;
     const [serviceId, setServiceId] = useState(Number);
@@ -69,6 +68,11 @@ function ServiceProfile() {
 
     const handleOfferChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, files } = e.target as HTMLInputElement;
+
+        // Enforce maxLength for specific fields
+        if (name === 'name' && value.length > 50) return; // name should not exceed 50 chars
+        if (name === 'description' && value.length > 50) return; // description should not exceed 50 chars
+
         if (name === "imageFile" && files && files.length > 0) {
             // Handle the file input
             setNewOffer(prevOffer => ({
@@ -87,6 +91,10 @@ function ServiceProfile() {
     const handleServiceChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
     
+        // Enforce maxLength for specific fields
+        if (name === 'name' && value.length > 50) return; // name should not exceed 50 chars
+        if (name === 'description' && value.length > 50) return; // description should not exceed 50 chars
+
         if (name.startsWith("address.")) {    
             const addressField = name.split(".")[1];
             setNewService(prevService => ({
@@ -221,7 +229,7 @@ function ServiceProfile() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
-            <div className="mt-8 w-full max-w-md">
+            <div>
                 <h2 className="text-xl font-semibold mb-4 text-center">Your Offers</h2>
                 {offers.length > 0 ? (
                     <OfferList offers={offers} serviceId={serviceId}/>
@@ -271,23 +279,64 @@ function ServiceProfile() {
                                 <form onSubmit={handleAddOffer} className="mt-4 space-y-4">
                                     <div>
                                         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Offer Name</label>
-                                        <input type="text" id="name" name="name" value={newOffer.name} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            value={newOffer.name}
+                                            onChange={handleOfferChange}
+                                            required
+                                            maxLength={50} // Enforcing the max length from @Column(length = 50)
+                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
                                     </div>
                                     <div>
                                         <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-                                        <textarea id="description" name="description" value={newOffer.description} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                        <textarea
+                                            id="description"
+                                            name="description"
+                                            value={newOffer.description}
+                                            onChange={handleOfferChange}
+                                            required
+                                            maxLength={50} // Enforcing the max length from @Length(max = 50)
+                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        ></textarea>
                                     </div>
                                     <div>
                                         <label htmlFor="duration" className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
-                                        <input type="number" id="duration" name="duration" value={newOffer.duration} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                                        <input
+                                            type="number"
+                                            id="duration"
+                                            name="duration"
+                                            value={newOffer.duration}
+                                            onChange={handleOfferChange}
+                                            required
+                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
                                     </div>
                                     <div>
                                         <label htmlFor="imageFile" className="block text-sm font-medium text-gray-700">Image Path</label>
-                                        <input type="file" accept="image/*" id="imageFile" name="imageFile" onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            id="imageFile"
+                                            name="imageFile"
+                                            onChange={handleOfferChange}
+                                            required
+                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
                                     </div>
                                     <div>
                                         <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-                                        <input type="number" id="price" name="price" value={newOffer.price} onChange={handleOfferChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                                        <input
+                                            type="number"
+                                            id="price"
+                                            name="price"
+                                            value={newOffer.price}
+                                            onChange={handleOfferChange}
+                                            required
+                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
                                     </div>
                                     <button type="submit" className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out">Add Offer</button>
                                 </form>

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { IOfferType } from "../interfaces/IOfferType";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Dialog, Transition } from '@headlessui/react'; // Import Dialog and Transition from Headless UI
 
 interface OfferProps {
   offer: IOfferType;
@@ -10,6 +11,8 @@ interface OfferProps {
 
 export function Offer({ offer, serviceId, index }: OfferProps) {
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Track whether modal is open or closed
+  const navigate = useNavigate();
 
   useEffect(() => {
     let url: string | undefined;
@@ -30,28 +33,116 @@ export function Offer({ offer, serviceId, index }: OfferProps) {
 
   const appointmentPath = `/service/${serviceId}/offers/${offer.id}/appointment`;
 
+  // Function to handle button click for appointment navigation
+  const handleAppointmentClick = () => {
+    navigate(appointmentPath);
+  };
+
+  // Function to open the modal for "Learn more"
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <Link to={appointmentPath} state={{ offer }}>
-      <div
-        key={index}
-        className="bg-white p-5 rounded-lg shadow-lg mb-6 border border-gray-200 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
-      >
-        <div className="flex flex-col md:flex-row items-center">
+    <>
+      <div key={index} className="offer-item">
+        <div className="offer-item-content">
           {imageUrl && (
             <img
               src={imageUrl}
               alt={`${offer.name} image`}
-              className="w-full md:w-48 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-4"
+              className="offer-image"
             />
           )}
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">{offer.name}</h3>
-            <p className="text-gray-600 mb-2">{offer.description}</p>
-            <p className="text-gray-700 mb-1">Duration: {offer.duration} minutes</p>
-            <p className="text-gray-700 font-medium">Price: ${offer.price}</p>
+          <div className="offer-details">
+            <h3 className="offer-title">{offer.name}</h3>
+            <p className="offer-price">Price: {offer.price}€</p>
+
+            <button
+              className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
+              onClick={handleAppointmentClick}
+            >
+              Book
+            </button>
+
+            {/* Button to open the "Learn more" modal */}
+            <button className="learn-more-button" onClick={openModal}>
+              Learn more...
+            </button>
           </div>
         </div>
       </div>
-    </Link>
+
+      {/* Modal Popup for "Learn more" */}
+      <Transition appear show={isModalOpen} as={Fragment}>
+        <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={closeModal}>
+          <div className="min-h-screen px-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black opacity-30" />
+            </Transition.Child>
+
+            <span className="inline-block h-screen align-middle" aria-hidden="true">
+              &#8203;
+            </span>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                  {offer.name}
+                </Dialog.Title>
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt={`${offer.name} image`}
+                    className="modal-image mt-4 mb-4 rounded-md"
+                  />
+                )}
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500">Description: {offer.description}</p>
+                  <p className="text-sm text-gray-500">Duration: {offer.duration} minutes</p>
+                  <p className="text-sm text-gray-500">Price: {offer.price}€</p>
+                </div>
+
+                <div className="mt-6">
+                  <button
+                    className="w-full px-4 py-2 mb-4 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
+                    onClick={handleAppointmentClick}
+                  >
+                    Book
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
+                    onClick={closeModal}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
   );
 }

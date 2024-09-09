@@ -79,7 +79,6 @@ const serviceAPI = {
     }
   },
   
-  
   post: async (data: FormData) => {
     try{
       let config = {

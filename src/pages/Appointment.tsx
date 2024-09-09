@@ -16,7 +16,7 @@ function Appointment() {
     const serviceIdnum = Number(serviceId);
     const offerIdnum = Number(offerId);
     const location = useLocation();
-    const offer = location.state?.offer as IOfferType;
+    const offer = location.state?.offer as IOfferType; // Offer data passed via state
 
     const [view, setView] = useState<View>('week');
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -36,7 +36,6 @@ function Appointment() {
     const fetchTimeSlots = async (date: Date) => {
         try {
             const response = await appointmentAPI.getAllAppointments(serviceIdnum);
-
             const slots = response.filter((slot: any) => {
                 const slotStartDate = moment.utc(slot.startDate).local();
                 return (
@@ -98,7 +97,6 @@ function Appointment() {
                     clientEmail: email,
                     description // Include the offer description
                 };
-                console.log("appointment", appointment)
                 await appointmentAPI.createAppointment(appointment);
                 alert('Appointment booked successfully!');
                 handleCloseModal();
@@ -113,7 +111,9 @@ function Appointment() {
     });
 
     return (
-        <div className="appointment-page min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
+        <div className="appointment-page min-h-screen bg-gray-50 flex flex-col items-center py-10">
+            <h1 className="text-3xl font-semibold text-gray-700 mb-8">
+            </h1>
             <Calendar
                 localizer={localizer}
                 events={timeSlots}
@@ -126,9 +126,10 @@ function Appointment() {
                 selectable
                 onNavigate={handleNavigate}
                 eventPropGetter={eventPropGetter}
-                style={{ height: 500 }}
+                style={{ height: 600, width: '90%' }} // Increase height and width for better layout
                 key={view + selectedDate?.toISOString()}
                 defaultDate={selectedDate ? moment(selectedDate).tz('Europe/Amsterdam').startOf('day').toDate() : new Date()}
+                className="rounded-lg shadow-md bg-white p-4" // Add box shadow and padding
             />
 
             <Transition appear show={isModalOpen} as={Fragment}>
@@ -160,11 +161,11 @@ function Appointment() {
                         >
                             <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                                 <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                                    Book Appointment
+                                    Book appointment
                                 </Dialog.Title>
                                 {selectedSlot && (
                                     <p className="text-sm text-gray-500">
-                                        Time: {moment(selectedSlot.start).format('hh:mm A')} - {moment(selectedSlot.end).format('hh:mm A')}
+                                        {moment(selectedSlot.start).format('hh:mm A')} - {moment(selectedSlot.end).format('hh:mm A')}
                                     </p>
                                 )}
                                 <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
@@ -176,7 +177,7 @@ function Appointment() {
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             required
-                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                         />
                                     </div>
                                     <div>
@@ -187,32 +188,34 @@ function Appointment() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">More information</label>
                                         <textarea
                                             id="description"
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             required
-                                            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                         ></textarea>
                                     </div>
-                                    <button
-                                        type="submit"
-                                        className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
-                                    >
-                                        Book Appointment
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleCloseModal}
-                                        className="w-full px-4 py-2 mt-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-150 ease-in-out"
-                                    >
-                                        Cancel
-                                    </button>
+                                    <div className="mt-6 space-y-4">
+                                        <button
+                                            type="submit"
+                                            className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
+                                        >
+                                            Book Appointment
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleCloseModal}
+                                            className="w-full px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition duration-150 ease-in-out"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </Transition.Child>
