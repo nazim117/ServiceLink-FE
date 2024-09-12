@@ -8,6 +8,7 @@ import appointmentAPI from '../API/appointmentAPI';
 import { ITimeSlot } from '../interfaces/ITimeSlot';
 import { IOfferType } from '../interfaces/IOfferType';
 import { Dialog, Transition } from '@headlessui/react'; // Import Dialog and Transition from Headless UI
+import '../styles/calendar.css'
 
 const localizer = momentLocalizer(moment);
 
@@ -16,7 +17,7 @@ function Appointment() {
     const serviceIdnum = Number(serviceId);
     const offerIdnum = Number(offerId);
     const location = useLocation();
-    const offer = location.state?.offer as IOfferType; // Offer data passed via state
+    const offer = location.state?.offer as IOfferType || { title: '', description: '' };
 
     const [view, setView] = useState<View>('week');
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -56,9 +57,9 @@ function Appointment() {
     };
 
     const handleSelectSlot = (slotInfo: SlotInfo) => {
-        const selectedDate = moment(slotInfo.start).startOf('day').toDate();
+        const selectedDate = moment(slotInfo.start).startOf('week').toDate();
         setSelectedDate(selectedDate);
-        setView('day');
+        setView('week');
         setSelectedSlot({
             start: slotInfo.start,
             end: slotInfo.end,
@@ -68,8 +69,8 @@ function Appointment() {
     };
 
     const handleNavigate = (date: Date) => {
-        if (view === 'day') {
-            setSelectedDate(moment(date).startOf('day').toDate());
+        if (view === 'week') {
+            setSelectedDate(moment(date).startOf('week').toDate());
         }
     };
 
@@ -119,14 +120,15 @@ function Appointment() {
                 events={timeSlots}
                 startAccessor="start"
                 endAccessor="end"
-                views={['week', 'day']}
+                views={['week']}
                 view={view}
                 onView={handleViewChange}
                 onSelectSlot={handleSelectSlot}
                 selectable
                 onNavigate={handleNavigate}
                 eventPropGetter={eventPropGetter}
-                style={{ height: 600, width: '90%' }} // Increase height and width for better layout
+                style={{ height: 650, width: '80%' }} // Increase height and width for better layout
+                longPressThreshold={0}
                 key={view + selectedDate?.toISOString()}
                 defaultDate={selectedDate ? moment(selectedDate).tz('Europe/Amsterdam').startOf('day').toDate() : new Date()}
                 className="rounded-lg shadow-md bg-white p-4" // Add box shadow and padding

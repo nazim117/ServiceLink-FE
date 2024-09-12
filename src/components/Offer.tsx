@@ -35,7 +35,7 @@ export function Offer({ offer, serviceId, index }: OfferProps) {
 
   // Function to handle button click for appointment navigation
   const handleAppointmentClick = () => {
-    navigate(appointmentPath);
+    navigate(appointmentPath, { state: { offer } });
   };
 
   // Function to open the modal for "Learn more"

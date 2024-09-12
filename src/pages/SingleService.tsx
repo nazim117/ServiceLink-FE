@@ -38,7 +38,7 @@ function SingleService(){
             {
                 service && 
                 <div>
-                    <Service key={service.id} service={service} />
+                    <Service key={service.id} service={service} disableLink={true}/>
                     {offers ? <OfferList offers={offers} serviceId={service.id}/> : "No offers"}
                 </div>
             }
