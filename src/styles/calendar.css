@@ -1,3 +1,6 @@
+.rbc-time-view {
+  touch-action: pan-y;
+}
 
 @media (max-width: 768px) {
     .rbc-time-content {

@@ -133,6 +133,7 @@ export function Offer({ offer, serviceId, index }: OfferProps) {
                   <button
                     type="button"
                     className="w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition duration-150 ease-in-out"
+                    aria-label="Cancel booking"
                     onClick={closeModal}
                   >
                     Close
