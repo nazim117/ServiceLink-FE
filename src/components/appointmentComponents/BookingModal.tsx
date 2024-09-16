@@ -1,32 +1,89 @@
-import React, { Fragment } from 'react';
+// src/components/appointmentComponents/BookingModal.tsx
+
+import React, { useState, useEffect, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import moment from 'moment';
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedSlot: any; // Replace 'any' with the appropriate type if available
-  name: string;
-  setName: React.Dispatch<React.SetStateAction<string>>;
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  description: string;
-  setDescription: React.Dispatch<React.SetStateAction<string>>;
-  handleFormSubmit: (event: React.FormEvent) => Promise<void>;
+  selectedDate: Date;
+  selectedTime: string | undefined;
+  onTimeSelect: (time: string | undefined) => void;
+  onSubmit: (bookingData: any) => Promise<void>;
+  events: any[]; // Adjust the type based on your ITimeSlot interface
 }
 
 const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
   onClose,
-  selectedSlot,
-  name,
-  setName,
-  email,
-  setEmail,
-  description,
-  setDescription,
-  handleFormSubmit,
+  selectedDate,
+  selectedTime,
+  onTimeSelect,
+  onSubmit,
+  events,
 }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [description, setDescription] = useState('');
+  const [availableTimes, setAvailableTimes] = useState<string[]>([]); // Available time slots
+
+  useEffect(() => {
+    // Generate available time slots for the selected date
+    const generateTimeSlots = () => {
+      const times: string[] = [];
+      const startHour = 9; // Business start time
+      const endHour = 17; // Business end time
+
+      for (let hour = startHour; hour < endHour; hour++) {
+        times.push(`${hour.toString().padStart(2, '0')}:00`);
+        times.push(`${hour.toString().padStart(2, '0')}:30`);
+      }
+
+      // Remove time slots that are already occupied
+      const occupiedTimes = events
+        .filter(event => {
+          const eventStart = new Date(event.start);
+          return (
+            eventStart.toDateString() === selectedDate.toDateString()
+          );
+        })
+        .map(event => {
+          const eventStart = new Date(event.start);
+          return moment(eventStart).format('HH:mm');
+        });
+
+      const filteredTimes = times.filter(time => !occupiedTimes.includes(time));
+      setAvailableTimes(filteredTimes);
+    };
+
+    generateTimeSlots();
+  }, [selectedDate, events]);
+
+  const handleFormSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log('Form submitted with:', { name, email, description, selectedTime }); // Debugging
+
+    // Validate email
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    if (!selectedTime) {
+      alert('Please select a time slot.');
+      return;
+    }
+
+    const bookingData = {
+      name,
+      email,
+      description,
+    };
+
+    await onSubmit(bookingData);
+  };
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={onClose}>
@@ -43,9 +100,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
             <div className="fixed inset-0 bg-black opacity-30" />
           </Transition.Child>
 
-          <span className="inline-block h-screen align-middle" aria-hidden="true">
-            &#8203;
-          </span>
+          {/* This element is to center the modal */}
+          <span className="inline-block h-screen align-middle">&#8203;</span>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -59,12 +115,35 @@ const BookingModal: React.FC<BookingModalProps> = ({
               <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                 Book Appointment
               </Dialog.Title>
-              {selectedSlot && (
-                <p className="text-sm text-gray-500">
-                  {moment(selectedSlot.start).format('hh:mm A')} -{' '}
-                  {moment(selectedSlot.end).format('hh:mm A')}
-                </p>
-              )}
+              <p className="text-sm text-gray-500 mt-2">
+                {moment(selectedDate).format('MMM DD, YYYY')}
+              </p>
+
+              {/* Time Selection */}
+              <div className="mt-4">
+                <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+                  Select Time
+                </label>
+                <select
+                  id="time"
+                  value={selectedTime}
+                  onChange={(e) => onTimeSelect(e.target.value)}
+                  required
+                  className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">-- Select a time slot --</option>
+                  {availableTimes.length > 0 ? (
+                    availableTimes.map((time) => (
+                      <option key={time} value={time}>
+                        {moment(time, 'HH:mm').format('h:mm A')}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No available time slots</option>
+                  )}
+                </select>
+              </div>
+
               <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -125,7 +204,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
         </div>
       </Dialog>
     </Transition>
-  );
+    );
+
 };
 
 export default BookingModal;

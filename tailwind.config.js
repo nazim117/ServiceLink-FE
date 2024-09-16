@@ -7,3 +7,5 @@ module.exports = {
   },
   plugins: [],
 }
+
+const { fontFamily } = require("tailwindcss/defaultTheme")

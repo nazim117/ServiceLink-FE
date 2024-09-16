@@ -1,192 +1,122 @@
-import React, { useState, useEffect, Fragment, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { momentLocalizer, View, SlotInfo } from 'react-big-calendar';
-import moment from 'moment';
-import 'moment-timezone';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import appointmentAPI from '../API/appointmentAPI';
-import { ITimeSlot } from '../interfaces/ITimeSlot';
-import { DateTime } from 'luxon';
-import {Notification} from "../components/Notification"
-import AppointmentCalendar from '../components/appointmentComponents/AppointmentCalendar';
+import React, { useState, useEffect } from 'react';
+import CustomCalendar from '../components/appointmentComponents/CustomCalendar';
 import BookingModal from '../components/appointmentComponents/BookingModal';
-
-const localizer = momentLocalizer(moment);
+import appointmentAPI from '../API/appointmentAPI';
+import { useParams } from 'react-router-dom';
+import { ITimeSlot } from '../interfaces/ITimeSlot';
 
 function Appointment() {
   const { serviceId, offerId } = useParams();
   const serviceIdnum = Number(serviceId);
   const offerIdnum = Number(offerId);
-  const [view, setView] = useState<View>('week');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [timeSlots, setTimeSlots] = useState<ITimeSlot[]>([]);
+  const [events, setEvents] = useState<ITimeSlot[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<ITimeSlot | null>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
-  const OCCUPIED_SLOT_COLOR = '#ff6961';
-  const AVAILABLE_SLOT_COLOR = '#77dd77';
+
+  // Fetch existing appointments
+  const fetchEvents = async () => {
+    try {
+      const appointments = await appointmentAPI.getAllAppointments(serviceIdnum);
+      setEvents(appointments);
+    } catch (error) {
+      console.error('Failed to fetch appointments', error);
+    }
+  };
 
   useEffect(() => {
-    if (selectedDate && view === 'week') {
-      fetchTimeSlots(selectedDate);
-    }
-  }, [selectedDate, view]);
+    fetchEvents();
+  }, [serviceIdnum]);
 
-  const fetchTimeSlots = async (date: Date) => {
-    setLoading(true)
-    try {
-      const response = await appointmentAPI.getAllAppointments(serviceIdnum);
-      const slots = response.filter((slot: any) => {
-        const slotStartDate = DateTime.fromISO(slot.startDate, { zone: 'utc' }).toLocal();
-        return (
-          slotStartDate.year === date.getFullYear() &&
-          slotStartDate.month === date.getMonth() + 1 &&
-          slotStartDate.day === date.getDate()
-        );
-      });
   
-      setTimeSlots(
-        slots.map((slot: any) => ({
-          start: DateTime.fromISO(slot.startDate, { zone: 'utc' }).toLocal().toJSDate(),
-          end: DateTime.fromISO(slot.endDate, { zone: 'utc' }).toLocal().toJSDate(),
-          occupied: true,
-        }))
-      );
-    } catch (error) {
-      console.error('Failed to fetch time slots', error);
-      alert('An error occurred while opening calendar. Please try again.');
-    } finally{
-        setLoading(false)
-    }
-  };
+  // Handle date selection from the calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
 
-  const handleSelectSlot = useCallback((slotInfo: SlotInfo) => {
-    if (moment(slotInfo.start).isBefore(moment())) {
-      return; // Ignore past slots
-    }
-  
-    // Check for overlap with occupied slots
-    const isOverlapping = timeSlots.some((slot) =>
-      moment(slot.start).isBefore(slotInfo.end) && moment(slot.end).isAfter(slotInfo.start)
-    );
-  
-    if (isOverlapping) {
-      alert('This time slot is already occupied.');
+    const now = new Date();
+    if (date.setHours(0,0,0,0) < now.setHours(0,0,0,0)) {
+      alert('Cannot select past dates.');
       return;
     }
-  
-    setSelectedSlot({
-      start: slotInfo.start,
-      end: slotInfo.end,
-      occupied: false,
-    });
+
+    setSelectedDate(date);
+    setSelectedTime(undefined);
     setIsModalOpen(true);
-  }, [timeSlots]);
-
-  const handleNavigate = (date: Date) => {
-    if (moment(date).isBefore(moment(), 'day')) {
-      // Prevent navigation to past dates
-      setSelectedDate(new Date());
-    } else {
-      setSelectedDate(date);
-    }
   };
 
-  const handleViewChange = (newView: View) => {
-    setView(newView);
-  };
+  
+  // Handle booking submission from the modal
+const handleBookingSubmit = async (bookingData: any) => {
+  try {
+    // Construct the appointment data required by your API
+    const startDateTime = new Date(selectedDate!);
+    const [hours, minutes] = selectedTime!.split(':').map(Number);
+    startDateTime.setHours(hours, minutes, 0, 0);
 
-  const handleCloseModal = () => {
+    const endDateTime = new Date(startDateTime);
+    endDateTime.setMinutes(endDateTime.getMinutes() + 30); // Assuming each appointment is 30 mins
+
+    const appointmentData = {
+      startDate: startDateTime,
+      endDate: endDateTime,
+      serviceId: serviceIdnum,
+      offerId: offerIdnum, // Adjust this based on your logic
+      clientName: bookingData.name,
+      clientEmail: bookingData.email,
+      description: bookingData.description,
+    };
+
+    // Call the API to create the appointment
+    await appointmentAPI.createAppointment(appointmentData);
+
+    // Close the modal
     setIsModalOpen(false);
-  };
 
-  const handleFormSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+    // Clear selected date and time
+    setSelectedDate(undefined);
+    setSelectedTime(undefined);
 
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-        alert('Please enter a valid email address.');
-        return;
+    // Refresh the events to include the new appointment
+    fetchEvents();
+
+    alert('Appointment booked successfully!');
+  } catch (error) {
+    console.error('Failed to book appointment', error);
+    alert('Failed to book appointment. Please try again.');
+  }
+};
+
+
+  // Calculate disabled days (e.g., fully booked days)
+  const disabledDays = events.reduce((acc, event) => {
+    const eventDate = new Date(event.start);
+    
+    if (acc.some(date => date.toDateString() === eventDate.toDateString())) {
+      return acc;
     }
-
-    if (selectedSlot) {
-      try {
-        const appointment = {
-          startDate: selectedSlot.start,
-          endDate: selectedSlot.end,
-          serviceId: serviceIdnum,
-          offerId: offerIdnum,
-          clientName: name,
-          clientEmail: email,
-          description, // Include the offer description
-        };
-        await appointmentAPI.createAppointment(appointment);
-        setBookingSuccess(true);
-        {bookingSuccess && <Notification message="Appointment booked successfully!" />}
-        handleCloseModal();
-      } catch (error) {
-        console.error('Failed to book appointment', error);
-        alert('An error occurred while booking your appointment. Please try again.');
-
-      }
-    }
-  };
-
-  const eventPropGetter = (event: ITimeSlot) => ({
-    style: { backgroundColor: event.occupied ? OCCUPIED_SLOT_COLOR  : AVAILABLE_SLOT_COLOR  },
-  });
-
-  const slotPropGetter = (date: Date): React.HTMLAttributes<HTMLDivElement> => {
-    if (moment(date).isBefore(moment())) {
-      return {
-        className: 'rbc-slot-past',
-        style: {
-          pointerEvents: 'none',
-          backgroundColor: '#f0f0f0',
-          color: '#d3d3d3',
-        },
-      };
-    } else {
-      return {};
-    }
-  };
+    return [...acc, eventDate];
+  }, [] as Date[]);
 
   return (
-    <div className="appointment-page min-h-screen bg-gray-50 flex flex-col items-center py-10">
-      <h1 className="text-3xl font-semibold text-gray-700 mb-8">Book an Appointment</h1>
-      {loading ? (
-        <div>Loading...</div>
-      ): (
-        <AppointmentCalendar
-        localizer={localizer}
-        events={timeSlots}
-        view={view}
-        onView={handleViewChange}
-        onSelectSlot={handleSelectSlot}
-        onNavigate={handleNavigate}
-        eventPropGetter={eventPropGetter}
-        slotPropGetter={slotPropGetter}
+    <div className="p-4 max-w-md mx-auto">
+      <h1 className="text-2xl font-bold mb-4 text-center">Book an Appointment</h1>
+      <CustomCalendar
         selectedDate={selectedDate}
-        loading={loading}
-      />)
-      }
-      
-      <BookingModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        selectedSlot={selectedSlot}
-        name={name}
-        setName={setName}
-        email={email}
-        setEmail={setEmail}
-        description={description}
-        setDescription={setDescription}
-        handleFormSubmit={handleFormSubmit}
+        onSelectDate={handleDateSelect}
+        disabledDays={disabledDays}
+        className="mb-4"
       />
-      {bookingSuccess && <Notification message="Appointment booked successfully!" />}
+      {isModalOpen && selectedDate && (
+        <BookingModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          onTimeSelect={setSelectedTime}
+          onSubmit={handleBookingSubmit}
+          events={events}
+        />
+      )}
     </div>
   );
 }
