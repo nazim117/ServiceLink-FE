@@ -47,8 +47,8 @@ const AppointmentsPage: React.FC = () => {
                         {appointments.map((appointment) => (
                             <tr key={appointment.id} className="border-b border-gray-200 hover:bg-gray-50 transition duration-150">
                                 <td className="py-3 px-4 text-gray-700">{appointment.description}</td>
-                                <td className="py-3 px-4 text-gray-700">{new Date(appointment.startDate).toLocaleString()}</td>
-                                <td className="py-3 px-4 text-gray-700">{new Date(appointment.endDate).toLocaleString()}</td>
+                                <td className="py-3 px-4 text-gray-700">{new Date(appointment.start).toLocaleString()}</td>
+                                <td className="py-3 px-4 text-gray-700">{new Date(appointment.end).toLocaleString()}</td>
                                 <td className="py-3 px-4 text-gray-700">{appointment.clientName}</td>
                                 <td className="py-3 px-4 text-gray-700">{appointment.clientEmail}</td>
                             </tr>

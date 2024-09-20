@@ -1,0 +1,133 @@
+/* Adjust calendar background and borders */
+.rbc-time-view {
+  border: none; /* Remove default borders */
+}
+
+.rbc-time-content {
+  border-top: 2px solid #ddd; /* Border at the top of the time grid */
+}
+
+/* Adjust time slot cells */
+.rbc-time-slot {
+  background-color: #e3f2fd; /* Light blue background for time slots */
+  border-bottom: 1px solid #ddd;
+}
+
+.rbc-time-header-content {
+  border-right: 1px solid #ddd;
+}
+
+/* Adjust day column headers */
+.rbc-header {
+  background-color: #f5f5f5; /* Light grey header background */
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  border-bottom: 2px solid #ddd; /* Header border */
+}
+
+.rbc-today {
+  background-color: #e0f7fa; /* Highlight current day */
+}
+
+.rbc-time-column {
+  border-right: 1px solid #ddd; /* Column dividers */
+}
+
+.rbc-time-slot {
+  height: 60px; /* Increase the slot height */
+}
+
+/* Adjust the look of the events */
+.rbc-event {
+  background-color: #1976d2;
+  color: white;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #1565c0;
+}
+
+.rbc-event:hover {
+  background-color: #1565c0;
+}
+
+/* Styles for mobile calendar */
+@media (max-width: 768px) {
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+
+  .react-datepicker {
+    width: 100% !important; /* Ensure the date picker takes up the full screen width */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .react-datepicker__header {
+    background-color: #1976d2; /* Blue header for mobile */
+    color: white;
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background-color: #1976d2; /* Highlight selected day */
+    color: white;
+  }
+
+  .react-datepicker__day:hover {
+    background-color: #e3f2fd; /* Light blue on hover */
+    color: #333;
+  }
+
+  .react-datepicker__month {
+    margin: 10px; /* Add padding for mobile */
+  }
+}
+
+/* General date picker input style */
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* src/styles/mobileCalendar.css */
+
+.mobile-calendar-container {
+  /* Adjust font sizes for readability on small screens */
+  font-size: 14px;
+}
+
+.mobile-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+}
+
+/* Hide unnecessary elements or adjust layout */
+.rbc-toolbar {
+  padding: 10px;
+}
+
+.rbc-calendar {
+  /* Ensure the calendar takes full width */
+  width: 100%;
+}
+
+/* Adjust event styling for better touch targets */
+.rbc-event {
+  padding: 5px;
+  margin: 2px 0;
+  border-radius: 4px;
+}
+
+/* Ensure the selected date is highlighted clearly */
+.rbc-selected {
+  background-color: #2196F3 !important;
+  color: white;
+}

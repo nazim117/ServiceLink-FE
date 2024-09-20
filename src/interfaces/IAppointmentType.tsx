@@ -1,7 +1,7 @@
 export interface IAppointmentType{
     id?: number;
-    startDate: Date;
-    endDate: Date;
+    start: Date;
+    end: Date;
     serviceId: number;
     offerId: number;
     clientName: string;
