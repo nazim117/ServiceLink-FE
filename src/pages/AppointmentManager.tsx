@@ -25,7 +25,6 @@ const AppointmentsPage: React.FC = () => {
             });
     }, [userId]);
     
-
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 

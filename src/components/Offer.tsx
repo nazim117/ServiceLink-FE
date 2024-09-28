@@ -31,7 +31,7 @@ export function Offer({ offer, serviceId, index }: OfferProps) {
     }
   }, [offer.imageFile]);
 
-  const appointmentPath = `/service/${serviceId}/offers/${offer.id}/appointment`;
+  const appointmentPath = `/service/${serviceId}/offers/${offer.id}/appointments`;
 
   // Function to handle button click for appointment navigation
   const handleAppointmentClick = () => {

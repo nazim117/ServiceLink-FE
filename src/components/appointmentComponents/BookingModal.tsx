@@ -18,51 +18,19 @@ const BookingModal: React.FC<BookingModalProps> = ({
   isOpen,
   onClose,
   selectedDate,
-  selectedTime,
-  onTimeSelect,
   onSubmit,
   events,
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
-  const [availableTimes, setAvailableTimes] = useState<string[]>([]); // Available time slots
 
   useEffect(() => {
-    // Generate available time slots for the selected date
-    const generateTimeSlots = () => {
-      const times: string[] = [];
-      const startHour = 9; // Business start time
-      const endHour = 17; // Business end time
-
-      for (let hour = startHour; hour < endHour; hour++) {
-        times.push(`${hour.toString().padStart(2, '0')}:00`);
-        times.push(`${hour.toString().padStart(2, '0')}:30`);
-      }
-
-      // Remove time slots that are already occupied
-      const occupiedTimes = events
-        .filter(event => {
-          const eventStart = new Date(event.start);
-          return (
-            eventStart.toDateString() === selectedDate.toDateString()
-          );
-        })
-        .map(event => {
-          const eventStart = new Date(event.start);
-          return moment(eventStart).format('HH:mm');
-        });
-
-      const filteredTimes = times.filter(time => !occupiedTimes.includes(time));
-      setAvailableTimes(filteredTimes);
-    };
-
-    generateTimeSlots();
   }, [selectedDate, events]);
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log('Form submitted with:', { name, email, description, selectedTime }); // Debugging
+    console.log('Form submitted with:', { name, email, description, selectedDate }); // Debugging
 
     // Validate email
     if (!/^\S+@\S+\.\S+$/.test(email)) {
@@ -70,7 +38,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
       return;
     }
 
-    if (!selectedTime) {
+    if (!selectedDate) {
       alert('Please select a time slot.');
       return;
     }
@@ -116,33 +84,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 Book Appointment
               </Dialog.Title>
               <p className="text-sm text-gray-500 mt-2">
-                {moment(selectedDate).format('MMM DD, YYYY')}
+                {moment(selectedDate).format('HH:mm, MMM DD, YYYY')}
               </p>
-
-              {/* Time Selection */}
-              <div className="mt-4">
-                <label htmlFor="time" className="block text-sm font-medium text-gray-700">
-                  Select Time
-                </label>
-                <select
-                  id="time"
-                  value={selectedTime}
-                  onChange={(e) => onTimeSelect(e.target.value)}
-                  required
-                  className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="">-- Select a time slot --</option>
-                  {availableTimes.length > 0 ? (
-                    availableTimes.map((time) => (
-                      <option key={time} value={time}>
-                        {moment(time, 'HH:mm').format('h:mm A')}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No available time slots</option>
-                  )}
-                </select>
-              </div>
 
               <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
                 <div>

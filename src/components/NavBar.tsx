@@ -2,10 +2,36 @@ import { Link } from "react-router-dom";
 import TokenManager from "../API/TokenManager";
 import Logout from "./Logout";
 import { useAuth } from "./AuthContext";
+import { useEffect, useState} from "react";
+import serviceAPI from "../API/serviceAPI";
 
 function NavBar() {
     const {isAuthenticated} = useAuth();
     const claims = TokenManager.getClaimsFromLocalStorage();
+    const [profileName, setProfileName] = useState(String)
+
+    useEffect(() => {
+        const fetchServiceAndOffers = async () => {
+            try {
+                const res = await serviceAPI.getServiceByUserId(claims?.userId);
+                const profileName = res.name ? res.name.replace(/\s+/g, '-').toLowerCase() : '';
+                setProfileName(profileName);    
+            } catch (error: unknown) {
+                // Type guard to ensure error is an instance of Error
+                if (error instanceof Error) {
+                  if (error.message === 'Service not found') {
+                    console.error("Service not found:", error);
+                  } else {
+                    console.error("An unexpected error occurred:", error);
+                  }
+                } else {
+                  console.error("An unexpected error occurred:", error);
+                }
+              }
+        };
+    
+        fetchServiceAndOffers();
+    }, [claims?.userId]);
 
     return (
         <nav className="bg-white shadow-md py-4">
@@ -26,10 +52,10 @@ function NavBar() {
                         {claims && (claims.roles.includes("SERVICE_PROVIDER")) && (
                             <>
                                 <li className="nav-item">
-                                    <Link className="text-gray-700 hover:text-blue-500" to="/service-profile">SERVICE</Link>
+                                    <Link className="text-gray-700 hover:text-blue-500" to={`${profileName}`}>SERVICE</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="text-gray-700 hover:text-blue-500" to="/appointmentmanager">BOOKING</Link>
+                                    <Link className="text-gray-700 hover:text-blue-500" to="/booked-appointments">BOOKING</Link>
                                 </li>
                             </>
                         )}

@@ -1,20 +1,34 @@
 // components/Appointment.jsx or Appointment.tsx
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CustomCalendar from '../components/appointmentComponents/CustomCalendar';
 import BookingModal from '../components/appointmentComponents/BookingModal';
 import appointmentAPI from '../API/appointmentAPI';
 import { useParams } from 'react-router-dom';
 import { ITimeSlot } from '../interfaces/ITimeSlot';
+import { IOfferType } from '../interfaces/IOfferType';
+import offerAPI from '../API/offerAPI';
 
 function Appointment() {
   const { serviceId, offerId } = useParams();
   const serviceIdnum = Number(serviceId);
   const offerIdnum = Number(offerId);
+  
+  const [offer, setOffer] = useState<IOfferType | null>(null);
   const [events, setEvents] = useState<ITimeSlot[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch offer details
+  const fetchOffer = async () => {
+    try {
+      const fetchedOffer = await offerAPI.getOfferById(offerIdnum);
+      setOffer(fetchedOffer);
+    } catch (error) {
+      console.error('Failed to fetch offer details', error);
+    }
+  };
 
   // Fetch existing appointments
   const fetchEvents = async () => {
@@ -27,8 +41,9 @@ function Appointment() {
   };
 
   useEffect(() => {
+    fetchOffer();
     fetchEvents();
-  }, [serviceIdnum]);
+  }, [serviceIdnum, offerIdnum]);
 
   const handleDateSelect = (date: Date | undefined) => {
     console.log("Date selected: ", date); // Debug log
@@ -56,38 +71,55 @@ function Appointment() {
 
   // Handle booking submission from the modal
   const handleBookingSubmit = async (bookingData: any) => {
+    if (!offer) {
+      alert('Offer details are not loaded yet. Please try again.');
+      return;
+    }
+
+    if(!selectedDate){
+      alert("Select a date")
+      return
+    }
+  
     try {
       // Construct the appointment data required by your API
       const startDateTime = new Date(selectedDate!);
-      const [hours, minutes] = selectedTime!.split(':').map(Number);
+      console.log("startdatetime ", startDateTime)
+      console.log("selectedDate", selectedDate)
+      console.log("selectedtime",selectedTime)
+      const hours = selectedDate.getHours();
+      const minutes = selectedDate.getMinutes();
       startDateTime.setHours(hours, minutes, 0, 0);
-
+  
       const endDateTime = new Date(startDateTime);
-      endDateTime.setMinutes(endDateTime.getMinutes() + 30); // Assuming each appointment is 30 mins
+      endDateTime.setMinutes(endDateTime.getMinutes() + offer.duration); // Use offer.duration
+      console.log("enddate", endDateTime)
+      console.log("enddate formula", endDateTime.getMinutes() + offer.duration)
 
       const appointmentData = {
-        start: startDateTime,
-        end: endDateTime,
+        start: startDateTime.toUTCString(),
+        end: endDateTime.toUTCString(),
         serviceId: serviceIdnum,
-        offerId: offerIdnum, // Adjust this based on your logic
+        offerId: offerIdnum,
         clientName: bookingData.name,
         clientEmail: bookingData.email,
         description: bookingData.description,
       };
-
+  
+      console.log("appointment", appointmentData);
       // Call the API to create the appointment
       await appointmentAPI.createAppointment(appointmentData);
-
+  
       // Close the modal
       setIsModalOpen(false);
-
+  
       // Clear selected date and time
       setSelectedDate(undefined);
       setSelectedTime(undefined);
-
+  
       // Refresh the events to include the new appointment
       fetchEvents();
-
+  
       alert('Appointment booked successfully!');
     } catch (error) {
       console.error('Failed to book appointment', error);
@@ -95,37 +127,31 @@ function Appointment() {
     }
   };
 
-  // Calculate disabled days (e.g., fully booked days)
-  const disabledDays = events.reduce((acc, event) => {
-    const eventDate = new Date(event.start);
-    const eventDateMidnight = new Date(eventDate);
-    eventDateMidnight.setHours(0, 0, 0, 0);
-
-    if (acc.some(date => date.toDateString() === eventDateMidnight.toDateString())) {
-      return acc;
-    }
-    return [...acc, eventDateMidnight];
-  }, [] as Date[]);
-
   return (
-    <div className="p-4 max-w-4xl mx-auto"> {/* Adjusted max width for larger screens */}
+    <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center">Book an Appointment</h1>
-      <CustomCalendar
-        selectedDate={selectedDate}
-        onSelectDate={handleDateSelect}
-        events={events} // Pass events to CustomCalendar
-        className="mb-4"
-      />
-      {isModalOpen && selectedDate && (
-        <BookingModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          selectedDate={selectedDate}
-          selectedTime={selectedTime}
-          onTimeSelect={setSelectedTime}
-          onSubmit={handleBookingSubmit}
-          events={events}
-        />
+      {!offer ? (
+        <p>Loading offer details...</p>
+      ) : (
+        <>
+          <CustomCalendar
+            selectedDate={selectedDate}
+            onSelectDate={handleDateSelect}
+            events={events}
+            className="mb-4"
+          />
+          {isModalOpen && selectedDate && (
+            <BookingModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              onTimeSelect={setSelectedTime}
+              onSubmit={handleBookingSubmit}
+              events={events}
+            />
+          )}
+        </>
       )}
     </div>
   );

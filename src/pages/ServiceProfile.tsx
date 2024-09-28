@@ -6,10 +6,11 @@ import OfferList from "../components/OfferList";
 import { IServiceType } from "../interfaces/IServiceType";
 import serviceAPI from "../API/serviceAPI";
 import TokenManager from "../API/TokenManager";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function ServiceProfile() {
     const navigate = useNavigate();
+    const { profileName } = useParams()
     const userId = TokenManager.getClaimsFromLocalStorage()?.userId;
     const [serviceId, setServiceId] = useState(Number);
     const [offers, setOffers] = useState<IOfferType[]>([]);
@@ -229,6 +230,7 @@ function ServiceProfile() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-6">
+                            <h1> Profile {profileName}</h1>
             <div>
                 <h2 className="text-xl font-semibold mb-4 text-center">Your Offers</h2>
                 {offers.length > 0 ? (

@@ -27,12 +27,12 @@ function App() {
               <Route path='/' element={<Home />} />
               <Route path='/service' element={<Service />} />
               <Route path='/service/:serviceId' element={<SingleService />} />
-              <Route path='/service/:serviceId/offers/:offerId/appointment' element={<Appointment />} />
-              <Route path="/appointmentmanager" element={<AppointmentsPage />} />
+              <Route path='/service/:serviceId/offers/:offerId/appointments' element={<Appointment />} />
+              <Route path="/booked-appointments" element={<AppointmentsPage />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route path="/signup" element={<Register />} />
               <Route path="/userProfile" element={<ProtectedRoute element={<UserProfile />} />} />
-              <Route path="/service-profile" element={<ProtectedRoute element={<ServiceProfile />} />} />
+              <Route path="/:profileName" element={<ProtectedRoute element={<ServiceProfile />} />} />
               <Route path="/unauthorized" element={<Unauthorized/>}/>
             </Routes>
           </div>
